@@ -13,3 +13,11 @@ export function parseLocaleNumber(stringNumber: string, locale: string): number 
         .replace(/[^0-9\.]/g, "")
     );
 }
+
+const intl = new Intl.NumberFormat("pt-Br")
+
+export const numberFormatter = {
+    percentage: (value: number) => value.toFixed(2) + "%",
+    number: intl.format,
+    currency: (value:number) => "R$" + intl.format(value),
+}

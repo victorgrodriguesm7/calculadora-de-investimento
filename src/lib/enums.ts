@@ -44,3 +44,8 @@ export type Asset = {
     currentPercentage: number;
     percentageGoal: number;
 }
+
+export type CSVResult = {
+    investments: Asset[],
+    summarize: Asset[] // Assets summarized by type
+}

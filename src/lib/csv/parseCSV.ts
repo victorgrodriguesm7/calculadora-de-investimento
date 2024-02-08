@@ -1,4 +1,5 @@
-import { CSVType, type Asset, type Line } from "$lib/enums";
+import { CSVType, type Asset, type Line, type CSVResult } from "$lib/enums";
+import { summarizeByType } from "$lib/utils/assets";
 import { parseNubankCSV } from "./parseNubankCSV";
 
 
@@ -22,11 +23,17 @@ async function readFile(file: File): Promise<Line[]>{
     })
 }
 
-export async function parseCSV(file: File, type: CSVType): Promise<Asset[]> {
+export async function parseCSV(file: File, type: CSVType): Promise<CSVResult> {
     const lines = await readFile(file);
+
+    const result = {} as CSVResult;
 
     switch (type){
         case CSVType.NuBank:
-            return parseNubankCSV(lines);
+            result.investments = parseNubankCSV(lines);
     }
+
+    result.summarize = summarizeByType(result.investments);
+
+    return result;
 }
