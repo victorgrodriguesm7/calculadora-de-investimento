@@ -7,7 +7,6 @@ async function readFile(file: File): Promise<Line[]>{
         const reader = new FileReader();
 
         reader.onload = (e) => {
-            console.log(e.target, e.target?.result)
             if (e.target && e.target.result){
                 const content = e.target.result as string;
 
@@ -19,7 +18,7 @@ async function readFile(file: File): Promise<Line[]>{
             reject();
         }
 
-        reader.readAsText(file);
+        reader.readAsText(file, 'windows-1252');
     })
 }
 

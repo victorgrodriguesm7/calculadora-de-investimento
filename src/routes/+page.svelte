@@ -13,7 +13,8 @@
                 const file = files.item(0);
 
                 if (file){
-                    parseCSV(file, selectedCsv);
+                    parseCSV(file, selectedCsv)
+                        .then((value) => console.log(value))
                 }
             }
         }
