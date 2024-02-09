@@ -1,12 +1,15 @@
 <script lang="ts">
     import { parseCSV } from "$lib/csv/parseCSV";
-    import { CSVOptions, type CSVResult, CSVType } from "$lib/enums";
+    import { CSVOptions, type CSVResult, CSVType, type Asset } from "$lib/enums";
     import { numberFormatter } from "$lib/utils/number";
+    import { calculateDeposit } from "$lib/utils/assets";
 
     let isHidden = true;
     let files: FileList;
     let selectedCsv: CSVType;
     let result: CSVResult;
+    let calculated: Asset[];
+    let totalToInvest: number = 0;
 
     async function OnImport(e: SubmitEvent){
         e.preventDefault();
@@ -20,6 +23,10 @@
                 }
             }
         }
+    }
+
+    function onCalculate(){
+        calculated = calculateDeposit(result.summarize, totalToInvest);
     }
 
     function renderHiddenable(value: string){
@@ -88,6 +95,14 @@
                 </li>
             {/each}
         </ul>
+
+        <div class="calculate-container">
+            <fieldset class="total-to-invest no-border">
+                <label for="total-to-invest">Total para Investir:</label>
+                <input id="total-to-invest" type="number" bind:value={totalToInvest} min="0"/>
+            </fieldset>
+            <button type="button" class="calculate" on:click={onCalculate}>Calcular Distribuição</button>
+        </div>
     </div>
 {/if}
 
@@ -163,8 +178,12 @@
         margin-bottom: 1rem;
     }
 
-    .import-result-value {
+    .import-result-item:first-child .import-result-value {
         text-align: center;
+    }
+
+    .import-result-value {
+        text-align: start;
     }
 
     .percentage-goal {
@@ -181,5 +200,43 @@
         border: 0;
         outline: 0;
         color: var(--text);
+        width: 2rem;
+    }
+
+    .calculate-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        padding-top: .5rem;
+    }
+
+    .calculate {
+        border: 0;
+        outline: 0;
+
+        padding: .5rem 1rem;
+        color: var(--text);
+        background: var(--secondary);
+        border-radius: var(--border05);
+
+        transition: all .2s ease;
+    }
+
+    .calculate:hover {
+        background: var(--secondary50);
+    }
+    
+    .total-to-invest input {
+        outline: 0;
+        border: 0;
+
+        background: var(--accent);
+
+        text-align: right;
+        color: var(--text);
+    
+        padding: .25rem;
+        border-radius: var(--border05);
     }
 </style>
