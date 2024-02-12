@@ -1,6 +1,6 @@
 <script lang="ts">
     import { parseCSV } from "$lib/csv/parseCSV";
-    import { CSVOptions, type CSVResult, CSVType, type Asset } from "$lib/enums";
+    import { CSVOptions, type CSVResult, CSVType, type AssetWithDeposit } from "$lib/enums";
     import { numberFormatter } from "$lib/utils/number";
     import { calculateDeposit } from "$lib/utils/assets";
 
@@ -8,7 +8,7 @@
     let files: FileList;
     let selectedCsv: CSVType;
     let result: CSVResult;
-    let calculated: Asset[];
+    let calculated: AssetWithDeposit[];
     let totalToInvest: number = 0;
 
     async function OnImport(e: SubmitEvent){
@@ -27,6 +27,8 @@
 
     function onCalculate(){
         calculated = calculateDeposit(result.summarize, totalToInvest);
+
+        console.log(calculated)
     }
 
     function renderHiddenable(value: string){
@@ -74,6 +76,7 @@
 
 {#if result != null}
     <div class="import-result">
+        <h3>Carteira</h3>
         <ul class="import-result-list">
             <li class="import-result-item">
                 <span class="import-result-value">Tipo de Ativo</span>
@@ -106,6 +109,29 @@
     </div>
 {/if}
 
+<div></div>
+
+{#if calculated != null}
+    <div class="deposit-result">
+        <h3>Distribuição do Aporte</h3>
+        <ul class="deposit-result-list">
+            <li class="deposit-result-item">
+                <span class="deposit-result-value">Tipo de Ativo</span>
+                <span class="deposit-result-value">Valor a Depositar</span>
+                <span class="deposit-result-value">Total %</span>
+                <span class="deposit-result-value">Nova %</span>
+            </li>
+            {#each calculated as assets}
+                <li class="deposit-result-item">
+                    <span class="deposit-result-value">{assets.label}</span>
+                    <span class="deposit-result-value">{numberFormatter.currency(assets.toDeposit)}</span>
+                    <span class="deposit-result-value">{numberFormatter.percentage(assets.percentageGoal)}</span>
+                    <span class="deposit-result-value">{numberFormatter.percentage(assets.newPercentage)}</span>
+                </li>
+            {/each}
+        </ul>
+    </div>
+{/if}
 </main>
 
 <style>
@@ -118,7 +144,8 @@
 
     .main-content {
         display: grid;
-        grid-template-columns: 1fr 3fr 1fr;
+        grid-template-columns: 1fr 3fr;
+        row-gap: 2rem;
     }
 
     .import-investments {
@@ -155,7 +182,7 @@
         background: var(--primary);
     }
 
-    .import-result {
+    .import-result, .deposit-result {
         width: 80%;
         max-width: 50vw;
         place-self: center;
@@ -163,7 +190,7 @@
         padding: 2rem;
     }
 
-    .import-result-list {
+    .import-result-list, .deposit-result-list {
         display: flex;
         flex-direction: column;
         list-style: none;
@@ -174,8 +201,13 @@
         grid-template-columns: repeat(3, 1fr) 2fr;
     }
 
-    .import-result-item:first-child {
-        margin-bottom: 1rem;
+    .deposit-result-item {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .import-result-item:first-child, .deposit-result-item:first-child {
+        margin: 1rem 0;
     }
 
     .import-result-item:first-child .import-result-value {
